@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PtheroDemo.DomainShared\PtheroDemo.Domain.Shared.csproj" />
     <ProjectReference Include="..\PttheroDemo.Domain\PtheroDemo.Domain.csproj" />
   </ItemGroup>
 

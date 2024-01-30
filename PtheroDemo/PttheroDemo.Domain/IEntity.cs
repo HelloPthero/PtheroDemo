@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace PtheroDemo.Domain
 {
-    public interface IEntity<T> 
+    public interface IEntity<K> where K : struct
     { 
-        public T Id { get; set; }
+        public K Id { get; set; }
     }
 }

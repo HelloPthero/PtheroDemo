@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PttheroDemo.Domain\PtheroDemo.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

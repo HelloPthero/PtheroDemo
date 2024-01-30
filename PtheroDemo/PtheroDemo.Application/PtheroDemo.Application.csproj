@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PtheroDemo.Application.Contract\PtheroDemo.Application.Contract.csproj" />
+    <ProjectReference Include="..\PtheroDemo.DomainShared\PtheroDemo.Domain.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PtheroDemo.Domain;
 using PtheroDemo.Domain.Entities;
@@ -12,9 +13,15 @@ using System.Threading.Tasks;
 
 namespace PtheroDemo.EntityFrameworkCore
 {
-    public class DBContext : DbContext
+    public class DBContext : DbContext, IDBContext
     {
         public DBContext(DbContextOptions<DBContext> options) : base(options) { }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            await base.SaveChangesAsync();
+            return 1;
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

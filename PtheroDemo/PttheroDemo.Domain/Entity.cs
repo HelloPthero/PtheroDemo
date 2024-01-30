@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace PtheroDemo.Domain
 {
-    public abstract class Entity<T> : IEntity<T>
+    public class Entity<K> : IEntity<K> where K : struct
     {
-        public virtual T Id { get; set; } 
+        public K Id { get; set; } 
     }
 }
