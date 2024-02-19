@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PtheroDemo.Application.Contract.IService;
 using PtheroDemo.Domain;
@@ -7,6 +8,7 @@ namespace PtheroDemo.Host.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class HomeController : ControllerBase
     {
         public IUserService UserService { get; set; } 
