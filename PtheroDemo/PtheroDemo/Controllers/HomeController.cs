@@ -16,16 +16,16 @@ namespace PtheroDemo.Host.Controllers
         
         
 
-        public HomeController(ILogger<HomeController> logger, IUserService userService)
-        {
-            _logger = logger;
-            UserService = userService;
-        }
+        //public HomeController(ILogger<HomeController> logger, IUserService userService)
+        //{
+        //    _logger = logger;
+        //    UserService = userService;
+        //}
 
         [HttpGet]
         public async Task<List<UserEntity>> GetUsers() 
         {
-            var users = await UserService.GetUsers();
+            var users =await UserService.GetUsers();
             return users;
         }
 

@@ -1,4 +1,12 @@
+using Autofac;
+using Autofac.Core;
+using Autofac.Extensions.DependencyInjection;
+using Autofac.Features.AttributeFilters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using PtheroDemo.Application;
 using PtheroDemo.Application.Contract.IService;
 using PtheroDemo.Application.Service;
 using PtheroDemo.Domain;
@@ -6,6 +14,7 @@ using PtheroDemo.Domain.Entities;
 using PtheroDemo.Domain.Shared.Base;
 using PtheroDemo.EntityFrameworkCore;
 using System.Reflection;
+using IModule = PtheroDemo.Domain.Shared.Base.IModule;
 
 namespace PtheroDemo.Host
 {
@@ -14,13 +23,10 @@ namespace PtheroDemo.Host
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            
-
-
-            // Add services to the container.
-
+            builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+            builder.Services.Replace(ServiceDescriptor.Transient<IControllerActivator, ServiceBasedControllerActivator>());
             builder.Services.AddControllers();
+
 
             //builder.Services.AddDbContext<DBContext>(db=>db.UseSqlServer(builder.Configuration.GetConnectionString("default"), b => b.MigrationsAssembly("PtheroDemo.EntityFrameworkCore")));
 
@@ -28,7 +34,7 @@ namespace PtheroDemo.Host
 
             //builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 
-            LoadModulesWithPrefix("PtheroDemo", builder.Services,builder.Configuration);
+            LoadModulesWithPrefix(builder.Host, builder.Services,builder.Configuration);
             //var serviceProvider = services.BuildServiceProvider();
             //builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
 
@@ -69,26 +75,77 @@ namespace PtheroDemo.Host
             app.Run();
         }
 
-        private static void LoadModulesWithPrefix(string prefix, IServiceCollection services,IConfiguration configuration)
+        private static void LoadModulesWithPrefix(ConfigureHostBuilder hostBuilder, IServiceCollection services,IConfiguration configuration)
         {
-            // 获取所有符合约定的程序集
-            var assemblies = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, $"{prefix}.*.dll")
-                .Select(Assembly.LoadFrom)
-                .ToList();
 
-            // 获取所有模块的 IModule 实现并调用 ConfigureServices
-            foreach (var assembly in assemblies)
+            
+            hostBuilder.ConfigureContainer<ContainerBuilder>(containerBuilder =>
             {
-                var moduleTypes = assembly.GetTypes()
-                    .Where(type => typeof(IModule).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
-                    .ToList();
+                var auModule = new AutofacModule(services, configuration);
+                containerBuilder.RegisterModule(auModule);
+                //containerBuilder.RegisterModule<AutofacModule>();
+                //Assembly service = Assembly.Load("PtheroDemo.Application");
+                //Assembly currentAssembly = Assembly.GetExecutingAssembly();
+                //containerBuilder.RegisterAssemblyTypes(service)  //服务层注入
+                //    .Where(t => t.Name.EndsWith("Service"))  //当一个接口有多个调用时，用于过滤
+                //    .AsImplementedInterfaces()
+                //    .InstancePerDependency()
+                //    .PropertiesAutowired(new CustomPropertySelector()); ;
 
-                foreach (var moduleType in moduleTypes)
-                {
-                    var moduleInstance = Activator.CreateInstance(moduleType) as IModule;
-                    moduleInstance?.ConfigureServices(services,configuration);
-                }
-            }
+                //containerBuilder.RegisterType<CustomPropertySelector>().As<IPropertySelector>();
+                ////containerBuilder.RegisterApiControllers(typeof(Program).Assembly);
+                ////containerBuilder.RegisterControllers(typeof(Program).Assembly);
+
+
+
+                //// 获取所有符合约定的程序集
+                //var assemblies = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, $"PtheroDemo.*.dll") 
+                //    .Select(Assembly.LoadFrom)
+                //    .ToList();
+
+
+
+                //// 获取所有模块的 IModule 实现并调用 ConfigureServices
+                //foreach (var assembly in assemblies)
+                //{
+                //    var moduleTypes = assembly.GetTypes()
+                //        .Where(type => typeof(IModule).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+                //        .ToList();
+
+                //    foreach (var moduleType in moduleTypes)
+                //    {
+                //        var moduleInstance = Activator.CreateInstance(moduleType) as IModule;
+                //        moduleInstance?.ConfigureServices(containerBuilder, services, configuration);
+                //    }
+                //}
+
+                ////var serviceTypes = Assembly.GetExecutingAssembly()
+                ////                       .GetTypes()
+                ////                       .Where(t => t.IsClass && !t.IsAbstract && t.GetInterfaces().Any() && t.Name.EndsWith("Service"))
+                ////                       .ToList();
+
+                ////// 注册这些服务 
+                ////foreach (var serviceType in serviceTypes)
+                ////{
+                ////    var interfaces = serviceType.GetInterfaces();
+                ////    foreach (var @interface in interfaces)
+                ////    {
+                ////        containerBuilder.RegisterType(serviceType).As(@interface).WithAttributeFiltering().InstancePerLifetimeScope();
+                ////        //services.AddTransient(@interface, serviceType);
+                ////    }
+                ////}
+
+                //var controllerBaseType = typeof(ControllerBase);   //控制器注入
+                //containerBuilder.RegisterAssemblyTypes(typeof(Program).Assembly)
+                //    .Where(t => controllerBaseType.IsAssignableFrom(t) && t != controllerBaseType)
+                //    .PropertiesAutowired(new CustomPropertySelector());
+
+                ////var applicationModule = new ApplicationModule();
+                ////applicationModule.ConfigureServices(containerBuilder, builder.Configuration);
+
+                //// 启用属性注入
+                ////containerBuilder.PropertiesAutowired();
+            });
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Autofac;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,6 @@ namespace PtheroDemo.Domain.Shared.Base
 {
     public interface IModule
     {
-        void ConfigureServices(IServiceCollection services,IConfiguration configuration);
+        void ConfigureServices(ContainerBuilder builder,IServiceCollection services,IConfiguration configuration);
     }
 }
