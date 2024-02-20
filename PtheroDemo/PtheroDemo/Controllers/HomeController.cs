@@ -8,15 +8,12 @@ namespace PtheroDemo.Host.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize]
+    //[Authorize]
     public class HomeController : ControllerBase
     {
         public IUserService UserService { get; set; } 
 
         private readonly ILogger<HomeController> _logger;
-
-        
-        
 
         //public HomeController(ILogger<HomeController> logger, IUserService userService)
         //{

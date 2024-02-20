@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Autofac.Extras.AttributeMetadata;
 using PtheroDemo.Domain.Shared.Base;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace PtheroDemo.Application.Service
 {
@@ -23,9 +24,8 @@ namespace PtheroDemo.Application.Service
 
         public async Task<List<UserEntity>> GetUsers() 
         {
-            var users = await UserRepository.GetAllAsync();
-            return users.ToList();
-            //return new List<UserEntity> { new UserEntity() };
+            var users = (await UserRepository.GetQueryableAsync()).ToList();
+            return users;
         }
     }
 }

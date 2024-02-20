@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -50,6 +51,15 @@ namespace PtheroDemo.Domain
         {
             _dbContext.Entry(entity).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<IQueryable<T>> GetQueryableAsync(Expression<Func<T, bool>> expression = null) 
+        {
+            if(expression == null)
+            {
+                return await Task.FromResult(_dbContext.Set<T>());
+            }
+            return await Task.FromResult(_dbContext.Set<T>().Where(expression));
         }
     }
 }

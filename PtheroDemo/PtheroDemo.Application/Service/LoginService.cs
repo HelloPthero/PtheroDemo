@@ -26,9 +26,7 @@ namespace PtheroDemo.Application.Service
 
         public async Task<DataResult> Login(LoginInputDto inputDto)
         {
-
-            var users = await UserRepository.GetAllAsync();   //todo 后续为Repository添加iqueryable相关方法
-            var user = users.Where(t => t.Name == inputDto.Name && t.Password == inputDto.Password).FirstOrDefault();
+            var user = (await UserRepository.GetQueryableAsync(t => t.Name == inputDto.Name && t.Password == inputDto.Password)).FirstOrDefault();
             if (user == null)
             {
                 return DataResult.Failure("校验失败");
