@@ -4,7 +4,7 @@
 
 efcore 对象关系映射✅
 
-repository 仓储✅
+repository 仓储✅     TODO:优化工作单元模式
 
 module 模块划分✅
 
@@ -37,3 +37,5 @@ sqlsugar 特殊数据sql处理
 邮件发送 
 
 数据版本控制
+
+友好异常转DataResult✅

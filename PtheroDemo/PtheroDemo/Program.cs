@@ -56,7 +56,10 @@ namespace PtheroDemo.Host
             });
 
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+            {
+                options.Filters.Add<FriendlyExceptionFilter>();
+            });
 
             //builder.RegisterAutoMapper(typeof(Startup));
 

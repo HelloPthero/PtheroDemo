@@ -3,6 +3,7 @@ using PtheroDemo.Application.Contract.Dtos.Department;
 using PtheroDemo.Application.Contract.IService;
 using PtheroDemo.Domain;
 using PtheroDemo.Domain.Entities;
+using PtheroDemo.Domain.Shared.Base;
 using PtheroDemo.Domain.Shared.BaseClass;
 using System;
 using System.Collections.Generic;
