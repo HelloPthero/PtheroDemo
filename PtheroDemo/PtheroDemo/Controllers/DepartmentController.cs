@@ -40,7 +40,7 @@ namespace PtheroDemo.Host.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<List<DepartmentEntity>> GetDepartmentList() 
+        public async Task<List<DepartmentDto>> GetDepartmentList() 
         {
             var list = await DepartmentService.GetDepartmentList();
             return list;

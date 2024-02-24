@@ -13,7 +13,7 @@ namespace PtheroDemo.Application.Contract.IService
     {
         Task DeleteDepartment(long id);
 
-        Task<List<DepartmentEntity>> GetDepartmentList();
+        Task<List<DepartmentDto>> GetDepartmentList(); 
 
         Task<DataResult> InsertDepartment(DepartmentDto departmentDto);
 

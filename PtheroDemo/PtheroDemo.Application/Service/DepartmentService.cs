@@ -1,4 +1,5 @@
-﻿using PtheroDemo.Application.Contract.Dtos.Department;
+﻿using AutoMapper;
+using PtheroDemo.Application.Contract.Dtos.Department;
 using PtheroDemo.Application.Contract.IService;
 using PtheroDemo.Domain;
 using PtheroDemo.Domain.Entities;
@@ -15,7 +16,9 @@ namespace PtheroDemo.Application.Service
     {
         #region ioc 
 
-        public IRepository<DepartmentEntity,long> DepartmentRepository { get; set; } 
+        public IRepository<DepartmentEntity,long> DepartmentRepository { get; set; }
+
+        public IMapper AutoMapper { get; set; }  
 
         #endregion 
         public async Task DeleteDepartment(long id)
@@ -23,10 +26,11 @@ namespace PtheroDemo.Application.Service
             await DepartmentRepository.DeleteAsync(t => t.Id == id);
         }
 
-        public async Task<List<DepartmentEntity>> GetDepartmentList()
+        public async Task<List<DepartmentDto>> GetDepartmentList()
         {
             var query = await DepartmentRepository.GetQueryableAsync();
-            return query.ToList();
+            var list = AutoMapper.Map<List<DepartmentDto>>(query);
+            return list;
         }
 
         public async Task<DataResult> InsertDepartment(DepartmentDto departmentDto)
