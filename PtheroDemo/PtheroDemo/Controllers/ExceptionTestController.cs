@@ -10,7 +10,7 @@ namespace PtheroDemo.Host.Controllers
     /// 异常测试
     /// </summary>
     [ApiController]
-    [Route("api/[controller]/[action]")]
+    [Route("[controller]/[action]")]
     public class ExceptionTestController:ControllerBase
     {
         /// <summary>

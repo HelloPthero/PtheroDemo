@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PtheroDemo.Application.Contract.Dtos.Department;
 using PtheroDemo.Application.Contract.Dtos.Login;
 using PtheroDemo.Application.Contract.IService;
@@ -8,7 +9,8 @@ using PtheroDemo.Domain.Shared.BaseClass;
 namespace PtheroDemo.Host.Controllers
 {
     [ApiController]
-    [Route("api/[controller]/[action]")]
+    [Route("[controller]/[action]")]
+    //[Authorize]
     public class DepartmentController : ControllerBase
     {
         public IDepartmentService DepartmentService { get; set; } 

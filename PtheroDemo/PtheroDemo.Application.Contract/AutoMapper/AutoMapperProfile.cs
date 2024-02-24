@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PtheroDemo.Application.Contract.Dtos.Department;
+using PtheroDemo.Application.Contract.Dtos.User;
 using PtheroDemo.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ namespace PtheroDemo.Application.Contract.AutoMapper
         {
             CreateMap<DepartmentEntity, DepartmentDto>()
                 .ReverseMap();
+
+            CreateMap<UserEntity, UserDto>();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using PtheroDemo.Domain.Entities;
+﻿using PtheroDemo.Application.Contract.Dtos.User;
+using PtheroDemo.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace PtheroDemo.Application.Contract.IService
 {
     public interface IUserService
     {
-        Task<List<UserEntity>> GetUsers();
+        Task<List<UserDto>> GetUsers();
+
+        UserDto GetCurrent();
     }
 }
