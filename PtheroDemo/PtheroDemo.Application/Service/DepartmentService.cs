@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using PtheroDemo.Application.Base;
 using PtheroDemo.Application.Contract.Dtos.Department;
 using PtheroDemo.Application.Contract.IService;
 using PtheroDemo.Domain;
@@ -13,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace PtheroDemo.Application.Service
 {
-    public class DepartmentService : IDepartmentService
+    public class DepartmentService : ServiceBase, IDepartmentService
     {
         #region ioc 
 

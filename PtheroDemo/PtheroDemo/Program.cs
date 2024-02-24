@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PtheroDemo.Application;
+using PtheroDemo.Application.Base;
 using PtheroDemo.Application.Contract.IService;
 using PtheroDemo.Application.Service;
 using PtheroDemo.Domain;
@@ -151,10 +152,14 @@ namespace PtheroDemo.Host
                 app.UseSwaggerUI();
             }
 
+            
+
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseMiddleware<CurrentUserMiddleware>();
 
 
             app.MapControllers();

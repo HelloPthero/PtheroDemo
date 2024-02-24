@@ -43,7 +43,9 @@ namespace PtheroDemo.Application.Service
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
+                    
                    new(ClaimTypes.Name, user.Name),
+                   new(ClaimTypes.NameIdentifier,user.Id.ToString())
                     // 还可以添加其他的声明，如用户ID、角色等
                 }),
                 Expires = DateTime.UtcNow.AddHours(1), // 设置令牌过期时间

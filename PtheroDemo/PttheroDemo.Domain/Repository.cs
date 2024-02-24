@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using PtheroDemo.Domain.Shared.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +17,16 @@ namespace PtheroDemo.Domain
 
         private readonly DbSet<T> _dbSet;
 
-        public Repository(IDBContext dbContext)
+        private ICurrentUser _currentUser;
+
+        //public IHttpContextAccessor HttpContextAccessor;
+
+        public Repository(IDBContext dbContext, IHttpContextAccessor httpContextAccessor)
         {
             _dbContext = dbContext;
             _dbSet = _dbContext.Set<T>();
+            _currentUser = httpContextAccessor.HttpContext.Items["CurrentUser"] as ICurrentUser;
+            //HttpContextAccessor = httpContextAccessor;
         }
 
         public async Task DeleteAsync(K id)
@@ -26,11 +34,11 @@ namespace PtheroDemo.Domain
             var e = await _dbSet.FindAsync(id);
             if (e != null)
             {
-                //_dbSet.Remove(e);
-                if (typeof(ISoftDeleted).IsAssignableFrom(typeof(T))) 
+                if(e is ISoftDeleted entity)
                 {
-                    PropertyInfo isDeletedProperty = typeof(T).GetProperty("IsDeleted");
-                    isDeletedProperty.SetValue(e, true);
+                    entity.IsDeleted = true;
+                    entity.DeleteUserId = _currentUser.UserId;
+                    entity.DeletedTime = DateTime.Now;
                 }
                 else
                 {
@@ -131,8 +139,10 @@ namespace PtheroDemo.Domain
                     if (entity is ISoftDeleted deletableEntity)
                     {
                         deletableEntity.IsDeleted = true;
+                        deletableEntity.DeleteUserId = _currentUser.UserId;
+                        deletableEntity.DeletedTime = DateTime.Now;
                         // 如果有必要，也可以设置删除时间等其他属性
-                        //deletableEntity.DeletedTime = DateTime.UtcNow;
+
                     }
                 }
                 // 提交更改到数据库

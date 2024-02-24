@@ -11,6 +11,8 @@ namespace PtheroDemo.Domain
     {
         public bool IsDeleted { get; set; }
 
-        //public DateTime? DeletedTime { get; set; } 
+        public DateTime? DeletedTime { get; set; }
+
+        public long? DeleteUserId { get; set; } 
     }
 }

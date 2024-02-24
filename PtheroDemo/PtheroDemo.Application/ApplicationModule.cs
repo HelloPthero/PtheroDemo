@@ -1,8 +1,10 @@
 ﻿using Autofac;
 using Autofac.Core;
 using Autofac.Features.AttributeFilters;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PtheroDemo.Application.Base;
 using PtheroDemo.Application.Contract.IService;
 using PtheroDemo.Application.Service;
 using PtheroDemo.Domain.Shared.Base;
@@ -19,6 +21,14 @@ namespace PtheroDemo.Application
     {
         public void ConfigureServices(ContainerBuilder containerBuilder, IServiceCollection services,IConfiguration configuration)
         {
+            containerBuilder.RegisterType<HttpContextAccessor>().As<IHttpContextAccessor>().SingleInstance(); //当前用户注入
+
+            containerBuilder.RegisterType<ServiceBase>().PropertiesAutowired();
+
+            
+
+            
+
             // 使用反射扫描当前程序集中的所有服务
             //var serviceTypes = Assembly.GetExecutingAssembly()
             //                           .GetTypes()
