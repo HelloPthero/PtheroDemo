@@ -18,7 +18,7 @@ automapper 实体映射✅
 
 hangfire 后台任务
 
-redis 缓存
+redis 分布式缓存✅
 
 rabbitmq 消息队列
 
