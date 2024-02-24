@@ -16,6 +16,7 @@ using PtheroDemo.Domain;
 using PtheroDemo.Domain.Entities;
 using PtheroDemo.Domain.Shared.Base;
 using PtheroDemo.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 using System.Text;
 using IModule = PtheroDemo.Domain.Shared.Base.IModule;
@@ -85,6 +86,27 @@ namespace PtheroDemo.Host
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
+                
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "PtheroDemo", Version = "v1" });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+                c.CustomOperationIds(apiDesc =>
+                {
+                    // 获取控制器名称
+                    var controllerName = apiDesc.ActionDescriptor.RouteValues["controller"];
+
+                    // 获取方法名称
+                    var methodName = apiDesc.HttpMethod + controllerName;
+
+                    // 返回方法名称作为操作 ID
+                    return methodName;
+                });
+                //c.CustomOperationIds(apiDesc =>
+                //{
+                //    return apiDesc.TryGetMethodInfo(out MethodInfo methodInfo) ? methodInfo.Name : "555";
+                //});
+
                 var securityScheme = new OpenApiSecurityScheme
                 {
                     Name = "Authorization",

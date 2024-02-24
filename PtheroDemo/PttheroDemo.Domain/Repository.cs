@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,7 +26,16 @@ namespace PtheroDemo.Domain
             var e = await _dbSet.FindAsync(id);
             if (e != null)
             {
-                 _dbSet.Remove(e);
+                //_dbSet.Remove(e);
+                if (typeof(ISoftDeleted).IsAssignableFrom(typeof(T))) 
+                {
+                    PropertyInfo isDeletedProperty = typeof(T).GetProperty("IsDeleted");
+                    isDeletedProperty.SetValue(e, true);
+                }
+                else
+                {
+                    _dbSet.Remove(e);
+                }
                 await _dbContext.SaveChangesAsync();
             }
         }
@@ -47,19 +57,94 @@ namespace PtheroDemo.Domain
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task InsertAsync(List<T> entities) 
+        {
+            await _dbSet.AddRangeAsync(entities);
+            await _dbContext.SaveChangesAsync();
+        }
+
         public async Task UpdateAsync(T entity)
         {
             _dbContext.Entry(entity).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task UpdateAsync(List<T> entities) 
+        {
+            _dbContext.Entry(entities).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+        }
+
         public async Task<IQueryable<T>> GetQueryableAsync(Expression<Func<T, bool>> expression = null) 
         {
-            if(expression == null)
+            IQueryable<T> queryable = _dbContext.Set<T>();
+
+            // Check if T implements ISoftDeleted
+            if (typeof(ISoftDeleted).IsAssignableFrom(typeof(T)))
             {
-                return await Task.FromResult(_dbContext.Set<T>());
+                // Create parameter expression
+                var parameter = Expression.Parameter(typeof(T));
+
+                // Get property expression for IsDeleted property
+                var isDeletedProperty = Expression.Property(parameter, "IsDeleted");
+
+                // Create constant expression for false
+                var falseValue = Expression.Constant(false);
+
+                // Create equality expression for IsDeleted == false
+                var isNotDeletedExpression = Expression.Equal(isDeletedProperty, falseValue);
+
+                // Combine the expressions
+                if (expression != null)
+                {
+                    // Combine the original expression with IsDeleted condition
+                    var combinedExpression = Expression.AndAlso(expression.Body, isNotDeletedExpression);
+                    var lambda = Expression.Lambda<Func<T, bool>>(combinedExpression, parameter);
+                    queryable = queryable.Where(lambda);
+                }
+                else
+                {
+                    // If no original expression provided, filter by IsDeleted == false directly
+                    queryable = queryable.Where(Expression.Lambda<Func<T, bool>>(isNotDeletedExpression, parameter));
+                }
             }
-            return await Task.FromResult(_dbContext.Set<T>().Where(expression));
+            else if (expression != null)
+            {
+                // Apply the original expression to the queryable
+                queryable = queryable.Where(expression);
+            }
+
+            return await Task.FromResult(queryable);
+        }
+
+        public async Task DeleteAsync(Expression<Func<T, bool>> predicate)
+        {
+            // 检查 T 是否实现了 IDeleted 接口
+            if (typeof(ISoftDeleted).IsAssignableFrom(typeof(T))) 
+            {
+                // 获取需要软删除的对象列表
+                var entitiesToDelete = await _dbContext.Set<T>().Where(predicate).ToListAsync();
+
+                // 遍历列表，将每个对象的 IsDeleted 属性设置为 true
+                foreach (var entity in entitiesToDelete)
+                {
+                    if (entity is ISoftDeleted deletableEntity)
+                    {
+                        deletableEntity.IsDeleted = true;
+                        // 如果有必要，也可以设置删除时间等其他属性
+                        //deletableEntity.DeletedTime = DateTime.UtcNow;
+                    }
+                }
+                // 提交更改到数据库
+                await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                // 如果 T 没有实现 IDeleted 接口，则直接删除符合条件的记录
+                var entitiesToDelete = await _dbContext.Set<T>().Where(predicate).ToListAsync();
+                _dbContext.Set<T>().RemoveRange(entitiesToDelete);
+                await _dbContext.SaveChangesAsync();
+            }
         }
     }
 }

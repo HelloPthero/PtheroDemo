@@ -21,7 +21,12 @@ namespace PtheroDemo.Domain
 
         Task<IQueryable<T>> GetQueryableAsync(Expression<Func<T, bool>> expression = null);
 
-        //Task DeleteAsync(Expression<Func<T, bool>> predicate);
+        Task DeleteAsync(Expression<Func<T, bool>> predicate);
+
+        Task InsertAsync(List<T> entities);
+
+        Task UpdateAsync(List<T> entities); 
+
 
 
     }
