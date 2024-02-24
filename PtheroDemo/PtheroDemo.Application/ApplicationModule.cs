@@ -14,6 +14,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
+using StackExchange.Redis;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace PtheroDemo.Application
 {
@@ -21,39 +24,48 @@ namespace PtheroDemo.Application
     {
         public void ConfigureServices(ContainerBuilder containerBuilder, IServiceCollection services,IConfiguration configuration)
         {
+            #region currentUser
             containerBuilder.RegisterType<HttpContextAccessor>().As<IHttpContextAccessor>().SingleInstance(); //当前用户注入
 
             containerBuilder.RegisterType<ServiceBase>().PropertiesAutowired();
 
-            
+            #endregion
 
-            
+            #region redis分布式缓存
 
-            // 使用反射扫描当前程序集中的所有服务
-            //var serviceTypes = Assembly.GetExecutingAssembly()
-            //                           .GetTypes()
-            //                           .Where(t => t.IsClass && !t.IsAbstract && t.GetInterfaces().Any() && t.Name.EndsWith("Service"))
-            //                           .ToList();
+            // 注册Redis连接实例
+            containerBuilder.Register(c =>
+            {
+                var cfg = ConfigurationOptions.Parse(configuration.GetConnectionString("Redis"));
+                return ConnectionMultiplexer.Connect(cfg); 
+            })
+            .As<ConnectionMultiplexer>()
+            .SingleInstance();
 
-            //// 注册这些服务 
-            //foreach (var serviceType in serviceTypes)
-            //{
-            //    var interfaces = serviceType.GetInterfaces();
-            //    foreach (var @interface in interfaces)
-            //    {
-            //        containerBuilder.RegisterType(serviceType).As(@interface).WithAttributeFiltering().InstancePerLifetimeScope();
-            //        //services.AddTransient(@interface, serviceType);
-            //    }
-            //}
-            //Assembly service = Assembly.Load("PtheroDemo.Application");
+            // 注册IDistributedCache服务
+            containerBuilder.Register(c =>
+            {
+                var redisConnection = c.Resolve<ConnectionMultiplexer>();
+                return new RedisCache(new RedisCacheOptions
+                {
+                    Configuration = redisConnection.Configuration
+                });
+            })
+            .As<IDistributedCache>()
+            .SingleInstance();
+
+            #endregion
+
+            #region 应用服务
+
             Assembly currentAssembly = Assembly.GetExecutingAssembly();
             containerBuilder.RegisterAssemblyTypes(currentAssembly)  //服务层注入
                 .Where(t => t.Name.EndsWith("Service"))  //当一个接口有多个调用时，用于过滤
                 .AsImplementedInterfaces()
                 .InstancePerDependency()
-                .PropertiesAutowired(); 
+                .PropertiesAutowired();
 
-            //containerBuilder.RegisterType(typeof(UserService)).As(typeof(IUserService)).PropertiesAutowired();
+            #endregion
         }
     }
 }
