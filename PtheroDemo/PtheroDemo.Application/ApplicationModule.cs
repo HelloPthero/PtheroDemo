@@ -17,6 +17,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using StackExchange.Redis;
 using Microsoft.Extensions.Caching.Distributed;
+using Hangfire;
+using Hangfire.EntityFrameworkCore;
+using Hangfire.SqlServer;
+using Autofac.Extensions.DependencyInjection;
+using PtheroDemo.EntityFrameworkCore;
 
 namespace PtheroDemo.Application
 {
@@ -66,6 +71,20 @@ namespace PtheroDemo.Application
                 .PropertiesAutowired();
 
             #endregion
+
+
+            #region hangfire
+
+            //services.AddHangfire(cf => cf
+            //    .UseSqlServerStorage(configuration.GetConnectionString("default")));
+
+            var hfContainerBuilder = new ContainerBuilder();
+            hfContainerBuilder.Populate(services);
+            var container = hfContainerBuilder.Build();
+            // 将 Autofac 容器设置为 Hangfire 的作业解析器
+            GlobalConfiguration.Configuration.UseAutofacActivator(container);
+            #endregion
         }
+
     }
 }

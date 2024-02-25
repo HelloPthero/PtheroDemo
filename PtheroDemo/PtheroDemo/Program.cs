@@ -2,11 +2,13 @@ using Autofac;
 using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Autofac.Features.AttributeFilters;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -19,6 +21,7 @@ using PtheroDemo.Domain.Entities;
 using PtheroDemo.Domain.Shared.Base;
 using PtheroDemo.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.ComponentModel;
 using System.Reflection;
 using System.Text;
 using IModule = PtheroDemo.Domain.Shared.Base.IModule;
@@ -62,16 +65,18 @@ namespace PtheroDemo.Host
                 options.Filters.Add<FriendlyExceptionFilter>();
             });
 
-            //builder.RegisterAutoMapper(typeof(Startup));
+
+            #region hangfire 
+
+            builder.Services.AddHangfire(configuration => configuration
+               .UseSqlServerStorage(builder.Configuration.GetConnectionString("default")));
 
 
-            //builder.Services.AddDbContext<DBContext>(db=>db.UseSqlServer(builder.Configuration.GetConnectionString("default"), b => b.MigrationsAssembly("PtheroDemo.EntityFrameworkCore")));
-
-            //builder.Services.AddScoped(typeof(IDBContext), typeof(DBContext));
-
-            //builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
+            #endregion 
 
             LoadModulesWithPrefix(builder.Host, builder.Services,builder.Configuration);
+
+            
             //var serviceProvider = services.BuildServiceProvider();
             //builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
 
@@ -160,6 +165,9 @@ namespace PtheroDemo.Host
             app.UseAuthorization();
 
             app.UseMiddleware<CurrentUserMiddleware>();
+
+            // ∆Ù”√ Hangfire “«±Ì∞Â
+            app.UseHangfireDashboard();
 
 
             app.MapControllers();

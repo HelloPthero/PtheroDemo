@@ -11,6 +11,10 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.2.0" />
     <PackageReference Include="Autofac.Extras.AttributeMetadata" Version="6.0.0" />
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.11" />
+    <PackageReference Include="Hangfire.Autofac" Version="2.6.0" />
+    <PackageReference Include="Hangfire.EntityFrameworkCore" Version="0.6.0" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.8.11" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.27" />
     <PackageReference Include="StackExchange.Redis" Version="2.7.20" />
   </ItemGroup>
@@ -18,6 +22,11 @@
   <ItemGroup>
     <ProjectReference Include="..\PtheroDemo.Application.Contract\PtheroDemo.Application.Contract.csproj" />
     <ProjectReference Include="..\PtheroDemo.DomainShared\PtheroDemo.Domain.Shared.csproj" />
+    <ProjectReference Include="..\PtheroDemo.EntityFrameworkCore\PtheroDemo.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="BackgroundWork\" />
   </ItemGroup>
 
 </Project>
